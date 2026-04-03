@@ -6,6 +6,6 @@ buildCommand = "npm install"
 command = "node kami.js"
 
 [env]
-NODE_VERSION = "22"
+NODE_VERSION = "20.x"
 NPM_CONFIG_LEGACY_PEER_DEPS = "true"
 NIXPACKS_NODE_VERSION = "22"
