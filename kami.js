@@ -131,18 +131,25 @@ function backupAppState(api) {
   }
 }
 
+// ─── Shared registry (used by reload command too) ────────────────────────────
+const registry = require("./commandRegistry");
+
 // ─── Command loader ───────────────────────────────────────────────────────────
 function loadCommands() {
-  const commands = new Map();
-  const keywords = new Map();
+  // Clear existing registry on (re)load
+  registry.commands.clear();
+  registry.keywords.clear();
 
   ensureDir(CONFIG.commandsDir);
 
   const files = fs.readdirSync(CONFIG.commandsDir).filter(f => f.endsWith(".js"));
 
   for (const file of files) {
+    const filePath = path.join(CONFIG.commandsDir, file);
     try {
-      const cmd = require(path.join(CONFIG.commandsDir, file));
+      // Bust cache so re-runs always get fresh code
+      delete require.cache[require.resolve(filePath)];
+      const cmd = require(filePath);
 
       if (!cmd || typeof cmd.execute !== "function") {
         log("LOADER", `Skipping ${file} — missing execute()`, YELLOW);
@@ -150,13 +157,13 @@ function loadCommands() {
       }
 
       if (cmd.name) {
-        commands.set(cmd.name.toLowerCase(), cmd);
+        registry.commands.set(cmd.name.toLowerCase(), cmd);
         log("LOADER", `Loaded command: ${CONFIG.prefix}${cmd.name}${cmd.adminOnly ? " 🔒" : ""}`, GREEN);
       }
 
       if (Array.isArray(cmd.keywords)) {
         for (const kw of cmd.keywords) {
-          keywords.set(kw.toLowerCase(), cmd);
+          registry.keywords.set(kw.toLowerCase(), cmd);
           log("LOADER", `Registered keyword: "${kw}"`, GREEN);
         }
       }
@@ -165,8 +172,8 @@ function loadCommands() {
     }
   }
 
-  log("LOADER", `${commands.size} command(s), ${keywords.size} keyword(s) loaded`, CYAN);
-  return { commands, keywords };
+  log("LOADER", `${registry.commands.size} command(s), ${registry.keywords.size} keyword(s) loaded`, CYAN);
+  return registry;
 }
 
 // ─── E2EE setup ──────────────────────────────────────────────────────────────
@@ -323,6 +330,13 @@ async function handleBuiltin(api, cmdName, args, threadID, senderID) {
 async function handleEvent(api, event, commands, keywords) {
   const { type, threadID, senderID, body } = event;
 
+  // ── Dispatch to command handleEvent hooks (e.g. session-based commands) ──
+  for (const cmd of commands.values()) {
+    if (typeof cmd.handleEvent === "function") {
+      try { await cmd.handleEvent({ api, event }); } catch { /* ignore */ }
+    }
+  }
+
   if (type !== "message" && type !== "message_reply") {
     writeLog("events.log", `[${new Date().toISOString()}] ${type} | thread:${threadID} | sender:${senderID}`);
     return;
@@ -469,7 +483,7 @@ async function main() {
   printBanner();
 
   const appState = loadAppState();
-  const { commands, keywords } = loadCommands();
+  loadCommands(); // populates registry.commands and registry.keywords
 
   setupAntiSuspension();
 
@@ -526,7 +540,7 @@ async function main() {
       if (!event) return;
 
       try {
-        await handleEvent(api, event, commands, keywords);
+        await handleEvent(api, event, registry.commands, registry.keywords);
       } catch (e) {
         log("EVENT", `Unhandled error: ${e.message}`, RED);
       }
