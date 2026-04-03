@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm install"
+
+[run]
+command = "node kami.js"
+
+[env]
+NODE_VERSION = "22"
+NPM_CONFIG_LEGACY_PEER_DEPS = "true"
+NIXPACKS_NODE_VERSION = "22"
