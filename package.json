@@ -1,5 +1,16 @@
 {
+  "name": "kami",
+  "version": "2.0.0",
+  "description": "Kami 2.0 — Facebook Messenger Bot",
+  "main": "kami.js",
+  "scripts": {
+    "start": "node kami.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
-    "@neoaz07/nkxfca": "^1.0.9"
+    "@neoaz07/nkxfca": "latest",
+    "string-similarity": "^4.0.4"
   }
 }
