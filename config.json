@@ -1,0 +1,46 @@
+{
+  "prefix": "/",
+  "appStatePath": "./appstate.json",
+  "commandsDir": "./commands",
+  "logsDir": "./logs",
+
+  "bot": {
+    "name": "Kami",
+    "version": "2.0",
+    "warmupOnStart": false,
+    "e2eeEnabled": false,
+    "healthInterval": 300000,
+    "backupInterval": 600000,
+    "lock": false
+  },
+
+  "admins": [
+    "100000434205615"
+  ],
+
+  "login": {
+    "online": true,
+    "selfListen": false,
+    "listenEvents": true,
+    "listenTyping": false,
+    "autoMarkDelivery": false,
+    "autoMarkRead": true,
+    "autoReconnect": true,
+    "simulateTyping": true,
+    "randomUserAgent": false,
+    "persona": "desktop",
+    "maxConcurrentRequests": 5,
+    "maxRequestsPerMinute": 50,
+    "requestCooldownMs": 60000,
+    "errorCacheTtlMs": 300000,
+    "stealthMode": false
+  },
+
+  "antiSuspension": {
+    "circuitBreakerCooldownMs": 2700000,
+    "warmupDurationMs": 1200000,
+    "warmupMaxMsgPerHour": 25,
+    "autoTripOnSignals": true,
+    "signals": ["checkpoint", "suspend", "spam", "block", "rate.limit"]
+  }
+}

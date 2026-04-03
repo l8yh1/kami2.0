@@ -1,0 +1,143 @@
+[
+  {
+    "key": "dbln",
+    "value": "%7B%22100000434205615%22%3A%22MVvOwVWb%22%2C%2261583731733999%22%3A%2257t9g1It%22%2C%2261582249743922%22%3A%22kkBc9Nni%22%7D",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.259Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "sb",
+    "value": "KvAxaeQG-sp1euKMs4IrJyNe",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.261Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "datr",
+    "value": "h8ePaVsRdz7bXryd_PWeH_QW",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.262Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "ps_l",
+    "value": "1",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.262Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "ps_n",
+    "value": "1",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.262Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "pas",
+    "value": "100003203322819%3APaKRf9XD1u%2C61584744787014%3A20HMlJDiQr%2C100000434205615%3Aa45XgTU2zT%2C61583731733999%3AZ3gn2iYiDs%2C61582249743922%3ATXPsPxBvxL",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.263Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "wl_cbv",
+    "value": "v2%3Bclient_version%3A3109%3Btimestamp%3A1773264063",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.263Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "locale",
+    "value": "en_GB",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.263Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "c_user",
+    "value": "61577450226238",
+    "expires": "2027-04-03T00:44:24.000Z",
+    "maxAge": 31536000,
+    "domain": "facebook.com",
+    "path": "/",
+    "secure": true,
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.263Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z",
+    "sameSite": "none"
+  },
+  {
+    "key": "wd",
+    "value": "1600x779",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.263Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  },
+  {
+    "key": "fr",
+    "value": "1rS2S4ps7jsIMMFIS.AWdCrKXznCp_xGQKEAbZMHHpMqoPYT-WyCjGkpy47Uq_9MjwHnc.Bpzw1o..AAA.0.0.Bpzw1o.AWfsP25SUCbf06AOIycv9iis7OI",
+    "expires": "2026-07-02T00:44:24.000Z",
+    "maxAge": 7776000,
+    "domain": "facebook.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.263Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z",
+    "sameSite": "none"
+  },
+  {
+    "key": "xs",
+    "value": "4%3Af6BmVzDnhmPqyQ%3A2%3A1775170527%3A-1%3A-1%3A%3AAcwj2Y59D4uQ5C2LJwn8d6bMWkbvWCyzDl1-s_XLhQ",
+    "expires": "2027-04-03T00:44:24.000Z",
+    "maxAge": 31536000,
+    "domain": "facebook.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true,
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.264Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z",
+    "sameSite": "none"
+  },
+  {
+    "key": "presence",
+    "value": "C%7B%22lm3%22%3A%22g.29764253159885334%22%2C%22t3%22%3A%5B%7B%22o%22%3A0%2C%22i%22%3A%22g.26031201313201928%22%7D%2C%7B%22o%22%3A0%2C%22i%22%3A%22g.851427114136733%22%7D%5D%2C%22utc3%22%3A1775176331356%2C%22v%22%3A1%7D",
+    "expires": "2027-04-03T00:44:05.000Z",
+    "domain": "facebook.com",
+    "path": "/",
+    "hostOnly": false,
+    "creation": "2026-04-03T00:44:05.264Z",
+    "lastAccessed": "2026-04-03T00:54:15.358Z"
+  }
+]
