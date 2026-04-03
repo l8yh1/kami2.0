@@ -2,10 +2,7 @@
 builder = "nixpacks"
 buildCommand = "npm install"
 
-[run]
-command = "node kami.js"
-
-[env]
-NODE_VERSION = "20.x"
-NPM_CONFIG_LEGACY_PEER_DEPS = "true"
-NIXPACKS_NODE_VERSION = "22"
+[deploy]
+startCommand = "node kami.js"
+restartPolicyType = "always"
+restartPolicyMaxRetries = 10
