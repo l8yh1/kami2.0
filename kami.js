@@ -14,6 +14,7 @@
 
 const fs   = require("fs");
 const path = require("path");
+const http = require("http");
 
 // ─── Load config.json ─────────────────────────────────────────────────────────
 const CONFIG_PATH = path.resolve(__dirname, "config.json");
@@ -464,6 +465,128 @@ async function handleEvent(api, event, commands, keywords) {
   }
 }
 
+// ─── Bot state (used by HTTP health server) ───────────────────────────────────
+const botState = { connected: false, startedAt: null, lastPing: null, lastHumanSim: null };
+
+// ─── HTTP Health Server ───────────────────────────────────────────────────────
+function startHttpServer() {
+  const port = CONFIG.keepAlive?.httpPort ?? 3000;
+
+  const server = http.createServer((req, res) => {
+    const uptime = botState.startedAt
+      ? Math.floor((Date.now() - botState.startedAt) / 1000)
+      : 0;
+
+    if (botState.connected) {
+      const body = JSON.stringify({
+        status:      "success",
+        bot:         CONFIG.bot.name,
+        version:     CONFIG.bot.version,
+        connected:   true,
+        uptimeSeconds: uptime,
+        lastPing:    botState.lastPing,
+        lastHumanSim: botState.lastHumanSim,
+      });
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(body);
+    } else {
+      const body = JSON.stringify({
+        status:    "error",
+        connected: false,
+        message:   "Bot is not connected to Facebook.",
+      });
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(body);
+    }
+  });
+
+  server.listen(port, "0.0.0.0", () => {
+    log("HTTP", `Health endpoint running on port ${port}`, GREEN);
+  });
+
+  server.on("error", (e) => {
+    log("HTTP", `Server error: ${e.message}`, RED);
+  });
+}
+
+// ─── Internal Keep-Alive Ping ─────────────────────────────────────────────────
+function randBetween(minMs, maxMs) {
+  return Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+}
+
+function startKeepAlive(api) {
+  const minMs = (CONFIG.keepAlive?.pingMinMinutes ?? 8)  * 60_000;
+  const maxMs = (CONFIG.keepAlive?.pingMaxMinutes ?? 18) * 60_000;
+
+  function schedulePing() {
+    const delay = randBetween(minMs, maxMs);
+    const mins  = (delay / 60_000).toFixed(1);
+    log("KEEPALIVE", `Next internal ping in ${mins} min`, DIM + CYAN);
+
+    setTimeout(async () => {
+      try {
+        await new Promise((resolve, reject) => {
+          api.getThreadList(1, null, [], (err) => (err ? reject(err) : resolve()));
+        });
+        botState.lastPing = new Date().toISOString();
+        log("KEEPALIVE", "Internal ping sent ✓", DIM + GREEN);
+      } catch (e) {
+        log("KEEPALIVE", `Ping failed: ${e.message}`, YELLOW);
+      }
+      schedulePing();
+    }, delay);
+  }
+
+  schedulePing();
+}
+
+// ─── Human Simulation ─────────────────────────────────────────────────────────
+function startHumanSimulation(api) {
+  const minMs = (CONFIG.humanSim?.minMinutes ?? 30)  * 60_000;
+  const maxMs = (CONFIG.humanSim?.maxMinutes ?? 120) * 60_000;
+
+  const actions = [
+    {
+      label: "friend-requests",
+      run: () => new Promise((resolve, reject) => {
+        api.getFriendRequests((err) => (err ? reject(err) : resolve()));
+      }),
+    },
+    {
+      label: "thread-list",
+      run: () => new Promise((resolve, reject) => {
+        api.getThreadList(5, null, [], (err) => (err ? reject(err) : resolve()));
+      }),
+    },
+    {
+      label: "friend-list",
+      run: () => new Promise((resolve, reject) => {
+        api.getFriendsList((err) => (err ? reject(err) : resolve()));
+      }),
+    },
+  ];
+
+  function scheduleSimulation() {
+    const delay = randBetween(minMs, maxMs);
+    const mins  = (delay / 60_000).toFixed(1);
+    log("HUMAN-SIM", `Next simulation in ${mins} min`, DIM + BLUE);
+
+    setTimeout(async () => {
+      const action = actions[Math.floor(Math.random() * actions.length)];
+      try {
+        await action.run();
+        botState.lastHumanSim = new Date().toISOString();
+        log("HUMAN-SIM", `Simulated visit: ${action.label} ✓`, DIM + BLUE);
+      } catch (e) {
+        log("HUMAN-SIM", `Simulation (${action.label}) failed: ${e.message}`, YELLOW);
+      }
+      scheduleSimulation();
+    }, delay);
+  }
+
+  scheduleSimulation();
+}
+
 // ─── Banner ───────────────────────────────────────────────────────────────────
 function printBanner() {
   console.log(`
@@ -487,6 +610,8 @@ async function main() {
 
   setupAntiSuspension();
 
+  startHttpServer();
+
   log("KAMI", "Logging in to Facebook...", CYAN);
 
   login({ appState }, CONFIG.login, async (err, api) => {
@@ -502,6 +627,9 @@ async function main() {
       process.exit(1);
     }
 
+    botState.connected = true;
+    botState.startedAt = Date.now();
+
     const selfID = api.getCurrentUserID();
     log("LOGIN", `Logged in ✓  (uid: ${selfID})`, GREEN);
     log("KAMI", `Admins: ${CONFIG.admins.length > 0 ? CONFIG.admins.join(", ") : "none configured"}`, YELLOW);
@@ -509,11 +637,14 @@ async function main() {
 
     setupE2EE(api);
     startHealthMonitor(api);
+    startKeepAlive(api);
+    startHumanSimulation(api);
 
     const backupTimer = setInterval(() => backupAppState(api), CONFIG.bot.backupInterval);
 
     const shutdown = (sig) => {
       log("KAMI", `${sig} received — saving session & exiting...`, YELLOW);
+      botState.connected = false;
       clearInterval(backupTimer);
       backupAppState(api);
       try { api.logout(); } catch { /* best-effort */ }
