@@ -134,7 +134,7 @@ async function askGroq(history) {
 }
 
 module.exports = {
-  name: "زاو",
+  name: "كامي",
   description: "محادثة مع Groq AI بشخصية زاو",
   adminOnly: false,
 
