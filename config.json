@@ -42,5 +42,16 @@
     "warmupMaxMsgPerHour": 25,
     "autoTripOnSignals": true,
     "signals": ["checkpoint", "suspend", "spam", "block", "rate.limit"]
+  },
+
+  "keepAlive": {
+    "httpPort": 3000,
+    "pingMinMinutes": 8,
+    "pingMaxMinutes": 18
+  },
+
+  "humanSim": {
+    "minMinutes": 30,
+    "maxMinutes": 120
   }
 }
