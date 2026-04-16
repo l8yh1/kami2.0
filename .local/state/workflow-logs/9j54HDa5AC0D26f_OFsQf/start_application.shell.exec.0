@@ -1,0 +1,43 @@
+[1G[0K⠙[1G[0K
+> kami@2.0.0 start
+> node kami.js
+
+[1G[0K⠙[1G[0K
+[36m[1m
+  ██╗  ██╗ █████╗ ███╗   ███╗██╗    ██████╗       ██████╗
+  ██║ ██╔╝██╔══██╗████╗ ████║██║    ╚════██╗      ██╔═████╗
+  █████╔╝ ███████║██╔████╔██║██║     █████╔╝      ██║██╔██║
+  ██╔═██╗ ██╔══██║██║╚██╔╝██║██║    ██╔═══╝       ████╔╝██║
+  ██║  ██╗██║  ██║██║ ╚═╝ ██║██║    ███████╗      ╚██████╔╝
+  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝    ╚══════╝       ╚═════╝
+[0m[2m  v2.0  ·  powered by nkxfca  ·  NeoKEX[0m
+
+[2m16:20:23[0m [32m[1m[LOADER][0m Loaded command: ،كامي
+[2m16:20:23[0m [32m[1m[LOADER][0m Loaded command: ،commands
+[2m16:20:23[0m [32m[1m[LOADER][0m Loaded command: ،التحكم 🔒
+[2m16:20:23[0m [32m[1m[LOADER][0m Loaded command: ،محرك 🔒
+[2m16:20:23[0m [32m[1m[LOADER][0m Loaded command: ،uptime
+[2m16:20:23[0m [32m[1m[LOADER][0m Loaded command: ،reload 🔒
+[2m16:20:23[0m [32m[1m[LOADER][0m Loaded command: ،ping
+[2m16:20:23[0m [36m[1m[LOADER][0m 7 command(s), 0 keyword(s) loaded
+[2m16:20:23[0m [32m[1m[ANTI-SUSP][0m Circuit breaker: OK ✓
+[2m16:20:23[0m [36m[1m[KAMI][0m Logging in to Facebook...
+[2m16:20:23[0m [32m[1m[HTTP][0m Health endpoint running on port 5000
+nkxfca
+Developed and maintained by NeoKEX
+GitHub: https://github.com/NeoKEX
+npm: https://www.npmjs.com/package/@neoaz07/nkxfca
+Based on nkxfca (@neoaz07/nkxfca) — credits: NeoKEX Team, ws3-fca, @dongdev/fca-unofficial
+[16:20:23] nkxfca VERSION @neoaz07/nkxfca v1.0.10
+[16:20:23] nkxfca STARTUP Initializing...
+[16:20:23] nkxfca LOG Logging in...
+[16:20:23] nkxfca LOG Using desktop persona with browser: Microsoft Edge
+[16:20:23] nkxfca LOG Cookies set for facebook.com and messenger.com domains
+[16:20:24] nkxfca ERROR loginHelper Not logged in.
+[2m16:20:24[0m [31m[1m[LOGIN][0m Failed: Not logged in. Session has expired.
+[1G[0K⠙[1G[0K[1mnpm[22m [96mnotice[39m
+[1mnpm[22m [96mnotice[39m New [31mmajor[39m version of npm available! [31m10.8.2[39m -> [34m11.12.1[39m
+[1mnpm[22m [96mnotice[39m Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.12.1[39m
+[1mnpm[22m [96mnotice[39m To update run: [4mnpm install -g npm@11.12.1[24m
+[1mnpm[22m [96mnotice[39m
+[1G[0K⠙[1G[0K

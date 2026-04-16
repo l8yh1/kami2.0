@@ -45,13 +45,74 @@
   },
 
   "keepAlive": {
-    "httpPort": 3000,
+    "httpPort": 5000,
     "pingMinMinutes": 8,
-    "pingMaxMinutes": 18
+    "pingMaxMinutes": 18,
+    "pingMinIntervalMin": 5,
+    "pingMaxIntervalMin": 10,
+    "saveCookiesIntervalHours": 2,
+    "refreshDtsgIntervalHours": 48,
+    "enabled": true
   },
 
   "humanSim": {
     "minMinutes": 30,
     "maxMinutes": 120
+  },
+
+  "humanTyping": {
+    "enable": true,
+    "minDelay": 800,
+    "maxDelay": 4200,
+    "charsPerSecond": 12,
+    "jitterPercent": 30,
+    "nightModeMultiplier": 2.2,
+    "thinkingPauseChance": 0.18,
+    "thinkingPauseMs": 1800
+  },
+
+  "stealthMode": {
+    "enabled": true,
+    "nightModeStart": 1,
+    "nightModeEnd": 6,
+    "nightModeSlowdown": true,
+    "burstProtection": true,
+    "burstThreshold": 5,
+    "burstCooldownMs": 8000,
+    "rotateUserAgentOnReconnect": true,
+    "diversePingEndpoints": true,
+    "randomizeReadReceipts": true,
+    "readReceiptDelay": 1500
+  },
+
+  "mqttHealthCheck": {
+    "enable": true,
+    "silentTimeoutMinutes": 10,
+    "checkIntervalMinMinutes": 2,
+    "checkIntervalMaxMinutes": 5,
+    "maxRestarts": 5,
+    "backoffMultiplier": 1.5,
+    "maxBackoffMinutes": 15,
+    "notifyAdmins": true
+  },
+
+  "tiers": {
+    "tier1": { "stateFile": "appstate.json",  "altFile": "appstate-backup.json"  },
+    "tier2": { "stateFile": "appstate2.json", "altFile": "appstate2-backup.json" },
+    "tier3": { "stateFile": "appstate3.json", "altFile": "appstate3-backup.json" }
+  },
+
+  "nkxModern": {
+    "enabled": true,
+    "enableTypingWrap": true,
+    "maxSendConcurrency": 4,
+    "sendWindowMs": 60000,
+    "sendWindowLimit": 45,
+    "enableCircuitBreaker": true,
+    "enableWarmup": true,
+    "warmupMinutes": 20,
+    "enableHealthBroadcast": true,
+    "healthBroadcastMinutes": 15,
+    "cacheFile": "cache/kami-cache.json"
   }
 }

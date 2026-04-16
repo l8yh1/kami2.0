@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@neoaz07/nkxfca": "latest",
+    "axios": "^1.15.0",
+    "fs-extra": "^11.3.4",
     "string-similarity": "^4.0.4"
   }
 }

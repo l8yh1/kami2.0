@@ -1,0 +1,38 @@
+
+> kami@2.0.0 start
+> node kami.js
+
+[1G[0K
+[36m[1m
+  ██╗  ██╗ █████╗ ███╗   ███╗██╗    ██████╗       ██████╗
+  ██║ ██╔╝██╔══██╗████╗ ████║██║    ╚════██╗      ██╔═████╗
+  █████╔╝ ███████║██╔████╔██║██║     █████╔╝      ██║██╔██║
+  ██╔═██╗ ██╔══██║██║╚██╔╝██║██║    ██╔═══╝       ████╔╝██║
+  ██║  ██╗██║  ██║██║ ╚═╝ ██║██║    ███████╗      ╚██████╔╝
+  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝    ╚══════╝       ╚═════╝
+[0m[2m  v2.0  ·  powered by nkxfca  ·  NeoKEX[0m
+
+[2m16:01:24[0m [32m[1m[LOADER][0m Loaded command: ،كامي
+[2m16:01:24[0m [32m[1m[LOADER][0m Loaded command: ،commands
+[2m16:01:24[0m [32m[1m[LOADER][0m Loaded command: ،التحكم 🔒
+[2m16:01:24[0m [32m[1m[LOADER][0m Loaded command: ،محرك 🔒
+[2m16:01:24[0m [32m[1m[LOADER][0m Loaded command: ،uptime
+[2m16:01:24[0m [32m[1m[LOADER][0m Loaded command: ،reload 🔒
+[2m16:01:24[0m [32m[1m[LOADER][0m Loaded command: ،ping
+[2m16:01:24[0m [36m[1m[LOADER][0m 7 command(s), 0 keyword(s) loaded
+[2m16:01:24[0m [32m[1m[ANTI-SUSP][0m Circuit breaker: OK ✓
+[2m16:01:24[0m [36m[1m[KAMI][0m Logging in to Facebook...
+[2m16:01:24[0m [32m[1m[HTTP][0m Health endpoint running on port 5000
+nkxfca
+Developed and maintained by NeoKEX
+GitHub: https://github.com/NeoKEX
+npm: https://www.npmjs.com/package/@neoaz07/nkxfca
+Based on nkxfca (@neoaz07/nkxfca) — credits: NeoKEX Team, ws3-fca, @dongdev/fca-unofficial
+[16:01:24] nkxfca VERSION @neoaz07/nkxfca v1.0.10
+[16:01:24] nkxfca STARTUP Initializing...
+[16:01:24] nkxfca LOG Logging in...
+[16:01:24] nkxfca LOG Using desktop persona with browser: Google Chrome
+[16:01:24] nkxfca LOG Cookies set for facebook.com and messenger.com domains
+[16:01:25] nkxfca ERROR loginHelper Not logged in.
+[2m16:01:25[0m [31m[1m[LOGIN][0m Failed: Not logged in. Session has expired.
+[1G[0K⠙[1G[0K

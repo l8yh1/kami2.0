@@ -30,6 +30,8 @@ CONFIG.appStatePath = path.resolve(__dirname, CONFIG.appStatePath);
 CONFIG.commandsDir  = path.resolve(__dirname, CONFIG.commandsDir);
 CONFIG.logsDir      = path.resolve(__dirname, CONFIG.logsDir);
 
+global.config = CONFIG;
+
 // ─── Dependency check ────────────────────────────────────────────────────────
 let login, globalAntiSuspension;
 try {
@@ -131,6 +133,20 @@ function backupAppState(api) {
     log("BACKUP", `Failed to save AppState: ${e.message}`, YELLOW);
   }
 }
+
+// ─── Includes — ZAO-sourced systems ──────────────────────────────────────────
+const kamiKeepAlive    = require("./includes/keepAlive");
+const { startHealthCheck: startMqttHealthCheck } = require("./includes/mqttHealthCheck");
+const { wrapApiWithTyping }    = require("./includes/humanTyping");
+const { globalStealthEngine }  = require("./includes/stealthEngine");
+const tierSwitch               = require("./includes/tierSwitch");
+const modernizeApi             = require("./includes/apiModernizer");
+const { preventLoginHelperHandlers, patchAntiSuspensionLimits } = require("./includes/nkxfcaPatcher");
+const { patchCookieApi }       = require("./includes/zaoCookiePatcher");
+const accountHealthMonitor     = require("./includes/accountHealthMonitor");
+
+// Apply the exit-handler safety patch BEFORE login() runs
+preventLoginHelperHandlers();
 
 // ─── Shared registry (used by reload command too) ────────────────────────────
 const registry = require("./commandRegistry");
@@ -345,6 +361,9 @@ async function handleEvent(api, event, commands, keywords) {
 
   if (!body) return;
 
+  await globalStealthEngine.handleIncoming(threadID);
+  await globalStealthEngine.randomizeReadReceipt(api, threadID);
+
   const trimmed    = body.trim();
   const lower      = trimmed.toLowerCase();
   const senderName = event.senderName || event.author || senderID;
@@ -353,7 +372,8 @@ async function handleEvent(api, event, commands, keywords) {
   // ── Log all incoming messages ────────────────────────────────────────────
   logMessage({ senderID, senderName, threadID, body: trimmed });
 
-  const context = { api, event, threadID, senderID, senderName, body: trimmed, config: CONFIG, isAdmin: admin };
+  const typingApi = wrapApiWithTyping(api, threadID);
+  const context = { api: typingApi, event, threadID, senderID, senderName, body: trimmed, config: CONFIG, isAdmin: admin };
 
   // ── Prefix commands ──────────────────────────────────────────────────────
   if (trimmed.startsWith(CONFIG.prefix)) {
@@ -381,7 +401,7 @@ async function handleEvent(api, event, commands, keywords) {
         `${CONFIG.prefix}e2ee <sub>\n` +
         `${CONFIG.prefix}lock [on|off]\n\n` +
         `🔒 = admin only`;
-      sendAndLog(api, reply, threadID, "help");
+      sendAndLog(typingApi, reply, threadID, "help");
       return;
     }
 
@@ -391,13 +411,12 @@ async function handleEvent(api, event, commands, keywords) {
         log("ACCESS", `🚫 ${senderName} (${senderID}) tried admin command /${cmdName}`, RED);
         writeLog("messages.log", `[${new Date().toISOString()}] [DENIED] ${senderName} (${senderID}) tried /${cmdName} thread:${threadID}`);
         if (!CONFIG.bot.lock) {
-          api.sendMessage("🔒 This is an admin-only command.", threadID);
+          typingApi.sendMessage("🔒 This is an admin-only command.", threadID);
         }
-        // if lock is on → silently ignore
         return;
       }
       log("CMD", `${YELLOW}${BOLD}[ADMIN]${RESET} ${YELLOW}${senderName}${RESET} » ${MAGENTA}/${cmdName}${RESET} ${args.join(" ")}`, YELLOW);
-      await handleBuiltin(api, cmdName, args, threadID, senderID);
+      await handleBuiltin(typingApi, cmdName, args, threadID, senderID);
       return;
     }
 
@@ -410,7 +429,7 @@ async function handleEvent(api, event, commands, keywords) {
       log("ACCESS", `🚫 ${senderName} (${senderID}) tried admin command /${cmdName}`, RED);
       writeLog("messages.log", `[${new Date().toISOString()}] [DENIED] ${senderName} (${senderID}) tried /${cmdName} thread:${threadID}`);
       if (!CONFIG.bot.lock) {
-        api.sendMessage("🔒 This is an admin-only command.", threadID);
+        typingApi.sendMessage("🔒 This is an admin-only command.", threadID);
       }
       return;
     }
@@ -424,9 +443,8 @@ async function handleEvent(api, event, commands, keywords) {
     log("CMD", `${getRoleLabel(senderID)} ${admin ? YELLOW : CYAN}${senderName}${RESET} » ${MAGENTA}/${cmdName}${RESET} ${args.join(" ")}`, admin ? YELLOW : CYAN);
 
     try {
-      // Wrap sendMessage so replies get logged
-      const originalSend = api.sendMessage.bind(api);
-      const patchedApi   = Object.assign(Object.create(Object.getPrototypeOf(api)), api, {
+      const originalSend = typingApi.sendMessage.bind(typingApi);
+      const patchedApi   = Object.assign(Object.create(Object.getPrototypeOf(typingApi)), typingApi, {
         sendMessage: (msg, tid, ...rest) => {
           logCommandReply({ cmdName, reply: msg, threadID: tid || threadID });
           return originalSend(msg, tid, ...rest);
@@ -436,7 +454,7 @@ async function handleEvent(api, event, commands, keywords) {
       await cmd.execute({ ...context, api: patchedApi, args });
     } catch (e) {
       log("CMD", `/${cmdName} threw: ${e.message}`, RED);
-      api.sendMessage(`⚠️ Error in /${cmdName}: ${e.message}`, threadID);
+      typingApi.sendMessage(`⚠️ Error in /${cmdName}: ${e.message}`, threadID);
     }
     return;
   }
@@ -630,15 +648,38 @@ async function main() {
     botState.connected = true;
     botState.startedAt = Date.now();
 
+    global._botApi            = api;
+    global._botStartTime      = Date.now();
+    global.activeAccountTier  = tierSwitch.readPersistedTier();
+    global.activeStateFile    = CONFIG.appStatePath;
+
     const selfID = api.getCurrentUserID();
     log("LOGIN", `Logged in ✓  (uid: ${selfID})`, GREEN);
     log("KAMI", `Admins: ${CONFIG.admins.length > 0 ? CONFIG.admins.join(", ") : "none configured"}`, YELLOW);
     log("KAMI", `Lock: ${CONFIG.bot.lock ? "🔒 ON" : "🔓 OFF"}`, CONFIG.bot.lock ? RED : GREEN);
 
+    // ── Raise the library's conservative anti-suspension limits ────────────
+    patchAntiSuspensionLimits();
+
+    // ── Patch cookie API (false-positive filter, auto-persist, setOptions guard)
+    patchCookieApi(api, {
+      tier:        global.activeAccountTier,
+      stateFile:   CONFIG.appStatePath,
+      loginMethod: "appstate"
+    });
+
+    // ── Modernizer — replaces library's sendMessage / getThreadInfo /
+    //    getUserInfo / listenMqtt with /includes/ implementations ────────────
+    modernizeApi(api);
+
+    // ── Account health monitor (cookie scan + send-failure watchdog) ────────
+    accountHealthMonitor.start(api);
+
     setupE2EE(api);
     startHealthMonitor(api);
-    startKeepAlive(api);
+    kamiKeepAlive.startKeepAlive();
     startHumanSimulation(api);
+    startMqttHealthCheck();
 
     const backupTimer = setInterval(() => backupAppState(api), CONFIG.bot.backupInterval);
 
@@ -653,29 +694,66 @@ async function main() {
     process.once("SIGINT",  () => shutdown("SIGINT"));
     process.once("SIGTERM", () => shutdown("SIGTERM"));
 
-    log("KAMI", "Listening for messages via MQTT...", GREEN);
-
-    api.listenMqtt(async (err, event) => {
-      if (err) {
-        log("MQTT", `Error: ${err.message || JSON.stringify(err)}`, RED);
-        if (isSuspensionSignal(err.message)) {
-          globalAntiSuspension.tripCircuitBreaker(
-            "mqtt_error",
-            CONFIG.antiSuspension.circuitBreakerCooldownMs
-          );
-          log("ANTI-SUSP", "Circuit breaker tripped due to MQTT error.", RED);
-        }
-        return;
-      }
-
-      if (!event) return;
-
+    global._triggerAutoRelogin = function (reason) {
       try {
-        await handleEvent(api, event, registry.commands, registry.keywords);
+        const p = tierSwitch(reason);
+        if (p && typeof p.catch === 'function') {
+          p.catch(e => log("TIER", `autoRelogin rejected: ${e?.message || e}`, RED));
+        }
+      } catch (_) {}
+    };
+
+    function startMqttListener() {
+      global.handleListen = api.listenMqtt(async (err, event) => {
+        global.lastMqttActivity = Date.now();
+
+        if (err) {
+          log("MQTT", `Error: ${err.message || JSON.stringify(err)}`, RED);
+          if (isSuspensionSignal(err.message)) {
+            globalAntiSuspension.tripCircuitBreaker(
+              "mqtt_error",
+              CONFIG.antiSuspension.circuitBreakerCooldownMs
+            );
+            log("ANTI-SUSP", "Circuit breaker tripped due to MQTT error.", RED);
+          }
+          const errStr = String(err?.message || err).toLowerCase();
+          const isSession = ['session', 'expired', 'checkpoint', 'unauthorized', 'logout', '406', 'login_blocked', 'account_inactive'].some(k => errStr.includes(k));
+          if (isSession && typeof global._triggerAutoRelogin === 'function') {
+            global._triggerAutoRelogin('mqtt_error: ' + errStr.slice(0, 100));
+          }
+          return;
+        }
+
+        if (!event) return;
+
+        try {
+          await handleEvent(api, event, registry.commands, registry.keywords);
+        } catch (e) {
+          log("EVENT", `Unhandled error: ${e.message}`, RED);
+        }
+      });
+    }
+
+    global._restartListener = function () {
+      try {
+        if (global.handleListen && typeof global.handleListen.stopListening === 'function') {
+          try { global.handleListen.stopListening(); } catch (_) {}
+        }
+        setTimeout(() => {
+          try {
+            startMqttListener();
+            log("MQTT", "Listener restarted ✓", GREEN);
+          } catch (e) {
+            log("MQTT", `Listener restart failed: ${e.message}`, RED);
+          }
+        }, 1500);
       } catch (e) {
-        log("EVENT", `Unhandled error: ${e.message}`, RED);
+        log("MQTT", `_restartListener error: ${e.message}`, RED);
       }
-    });
+    };
+
+    log("KAMI", "Listening for messages via MQTT...", GREEN);
+    startMqttListener();
   });
 }
 
